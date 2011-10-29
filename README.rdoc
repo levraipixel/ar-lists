@@ -1,3 +1,4 @@
-= ArLists
+= ActiveRecord Lists extension
 
-This project rocks and uses MIT-LICENSE.
+This gem adds class methods to ActiveRecord::Base to enable list-like relations.
+
