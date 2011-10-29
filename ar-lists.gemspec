@@ -1,8 +1,9 @@
 # CURRENT FILE :: ar-lists.gemspec
-require File.expand_path("../lib/ar-lists/version", __FILE__)
 
-# Provide a simple gemspec so you can easily use your enginex
-# project in your rails apps through git.
+# -*- encoding: utf-8 -*-
+$:.push File.expand_path("../lib", __FILE__)
+require "ar-lists/version"
+
 Gem::Specification.new do |s|
   s.name				= "ar-lists"
   s.version			= ArLists::VERSION
@@ -10,14 +11,14 @@ Gem::Specification.new do |s|
   s.authors			= ["Yann Hourdel"]
   s.email				= ["yann.hourdel@gmail.com"]
   s.homepage		= "http://about.me/yann.hourdel"
-  s.summary			= "ar-lists-#{s.version}"
-  s.description	= "Provides List-like relations for ActiveRecord Models."
 
-  s.rubyforge_project					= "ar-lists"
   s.required_rubygems_version	= "> 1.3.6"
 
-  s.files				= `git ls-files`.split("\n")
-  s.executables	= `git ls-files`.split("\n").map{|f| f =~ /^bin\/(.*)/ ? $1 : nil}.compact
+  s.files					= `git ls-files`.split("\n")
+  s.test_files		= `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.require_paths	= ["lib"]
 
-	s.require_path	= 'lib'
+  s.summary			= "ar-lists-#{s.version}"
+  s.description	= "Provides List-like relations for ActiveRecord Models."
 end

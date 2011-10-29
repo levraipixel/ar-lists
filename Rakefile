@@ -1,3 +1,5 @@
+# CURRENT FILE :: Rakefile
+
 # encoding: UTF-8
 require 'rubygems'
 begin
@@ -22,7 +24,7 @@ task :default => :test
 
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Ar-lists'
+  rdoc.title    = 'ArLists'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README.rdoc')
   rdoc.rdoc_files.include('lib/**/*.rb')

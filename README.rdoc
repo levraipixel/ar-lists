@@ -1,4 +1,0 @@
-= ActiveRecord Lists extension
-
-This gem adds class methods to ActiveRecord::Base to enable list-like relations.
-
