@@ -22,10 +22,9 @@ Use provided class methods in your ActiveRecord Models:
 
 class UsersGroup < ActiveRecord::Base
 
-	array_accessible :notes
-	array_accessible :uniq_notes, :uniq => true
-
 	has_list :users, :class_name => 'User'
+
+	array_accessible :notes
 
 end
 </code></pre>
@@ -38,17 +37,13 @@ Then access the lists like any other attribute:
 
 @users_group = UsersGroup.first
 
-@users_group.notes = [12,14,12]
-@users_group.notes
-# -> [12,14,12]
-
-@users_group.uniq_notes = [12,14,12]
-@users_group.uniq_notes
-# -> [12,14]
-
 @users_group.users = [User.find(2), User.find(25), User.find(5)]
 @users_group.users
 # -> [#<User:0x... @id=2>, #<User:0x... @id=25>, #<User:0x... @id=5>]
+
+@users_group.notes = [12,14,12]
+@users_group.notes
+# -> [12,14,12]
 
 ...
 </code></pre>
@@ -79,6 +74,58 @@ Then only one instance of each element is added to the list:
 @users_group.uniq_notes = [12,14,12]
 @users_group.uniq_notes
 # -> [12,14]
+
+...
+</code></pre>
+
+h3. Manipulating IDs for performance matters
+
+When manipulating @:has_list@ relations, you can use ID-methods instead of standard methods to improve performance:
+
+<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+
+...
+
+@users_group = UsersGroup.first
+
+@users_group.users = [User.find(2), User.find(25), User.find(5)]
+@users_group.users
+# -> [#<User:0x... @id=2>, #<User:0x... @id=25>, #<User:0x... @id=5>]
+
+@users_group.users_ids = [13,42]
+@users_group.users
+# -> [#<User:0x... @id=13>, #<User:0x... @id=42>]
+@users_group.users_ids
+# -> [13,42]
+
+...
+</code></pre>
+
+h3. Non-existing instances
+
+When IDs you provide don't exist in your Database, the default behaviour is to ignore them. If you want, you can force an error to be thrown when this happens by using the @:strict@ option:
+
+<pre lang="ruby"><code>#File : app/models/users_group.rb
+
+class UsersGroup < ActiveRecord::Base
+
+	has_list :users, :class_name => 'User', :strict => true
+
+end
+</code></pre>
+
+Thus whenever your DB object contains old IDs that have been removed or you try to add by hand an ID that doesn't exist, an error will be thrown:
+
+<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+
+...
+
+@users_group = UsersGroup.first
+
+@users_group.users = [User.find(2), User.find(3)]
+User.find(3).destroy
+@users_group.users
+# -> throws "Unable to build list: RecordNotFound"
 
 ...
 </code></pre>
