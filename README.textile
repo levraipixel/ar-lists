@@ -1,0 +1,85 @@
+h1. ar-lists
+
+This gem adds class methods to ActiveRecord::Base to enable list-like relations.
+
+h2. Installation
+
+Add it to your gemfile:
+
+<pre lang="ruby"><code>gem "ar-lists"
+</code></pre>
+
+Update your bundle:
+
+<pre><code>bundle install
+</code></pre>
+
+h2. Basic Usage
+
+Use provided class methods in your ActiveRecord Models:
+
+<pre lang="ruby"><code>#File : app/models/users_group.rb
+
+class UsersGroup < ActiveRecord::Base
+
+	array_accessible :notes
+	array_accessible :uniq_notes, :uniq => true
+
+	has_list :users, :class_name => 'User'
+
+end
+</code></pre>
+
+Then access the lists like any other attribute:
+
+<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+
+...
+
+@users_group = UsersGroup.first
+
+@users_group.notes = [12,14,12]
+@users_group.notes
+# -> [12,14,12]
+
+@users_group.uniq_notes = [12,14,12]
+@users_group.uniq_notes
+# -> [12,14]
+
+@users_group.users = [User.find(2), User.find(25), User.find(5)]
+@users_group.users
+# -> [#<User:0x... @id=2>, #<User:0x... @id=25>, #<User:0x... @id=5>]
+
+...
+</code></pre>
+
+h2. Advanced Usage
+
+h3. Unicity of elements (group-like behaviour)
+
+You can use options to force lists to contain unique elements:
+
+<pre lang="ruby"><code>#File : app/models/users_group.rb
+
+class UsersGroup < ActiveRecord::Base
+
+	array_accessible :uniq_notes, :uniq => true
+
+end
+</code></pre>
+
+Then only one instance of each element is added to the list:
+
+<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+
+...
+
+@users_group = UsersGroup.first
+
+@users_group.uniq_notes = [12,14,12]
+@users_group.uniq_notes
+# -> [12,14]
+
+...
+</code></pre>
+
