@@ -128,7 +128,7 @@ end
 h3. Manipulating IDs for performance matters
 
 When manipulating @:has_list@ relations, you can use ID-methods instead of standard methods to improve performance.
-*%{color:red}Of course, this only works with non-polymorphic relations.%*
+*_Of course, this only works with non-polymorphic relations._*
 
 <pre lang="ruby"><code>#File : app/models/users_group.rb
 
@@ -183,4 +183,6 @@ User.find(3).destroy
 
 ...
 </code></pre>
+
+Happy listing =)
 
