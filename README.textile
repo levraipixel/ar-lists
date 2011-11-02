@@ -43,14 +43,14 @@ Then access the lists like any other attribute:
 ]
 
 @user.phone_numbers
-# -> ["+33 6 12 34 56 78","+33 1 98 76 54 32"]
+# -> ["+33 6 12 34 56 78", "+33 1 98 76 54 32"]
 
 ...
 </code></pre>
 
 h3. Records lists
 
-This other method provides you with a mean to store a list of relations in one place. The class of your elements will be guessed from the attribute name, and elements will be stored with their ID.
+This other method provides you with a useful means to store a list of relations in one place. The class of your elements will be guessed from the attribute name, and elements will be stored with their ID.
 
 <pre lang="ruby"><code>#File : app/models/users_group.rb
 
@@ -80,10 +80,10 @@ h2. Advanced Usage
 
 h3. Customize the relation
 
-- @:class_name => 'Toto'@ allows you to force which class name to use (Toto, here)
-- @:uniq => true@ allows your list to act like a group with only one instance of each element
-- @:strict => true@ allows you to throw an error whenever a related record cannot be found anymore (cf. Non-existing instances)
-- @:polymorphic => true@ allows you to type the elements so that you can store different types of elements in the same list (cf. Polymorphic records list) 
+* @:class_name => 'Toto'@ allows you to force which class name to use (Toto, here)
+* @:uniq => true@ allows your list to act like a group with only one instance of each element max in the list
+* @:strict => true@ allows you to throw an error whenever a related record cannot be found anymore (cf. Non-existing instances)
+* @:polymorphic => true@ allows you to type the elements so that you can store different types of elements in the same list (cf. Polymorphic records list) 
 
 h3. Polymorphic records list
 
@@ -106,8 +106,8 @@ end
 class Group < ActiveRecord::Base
 	
 	has_list :members,
-		:polymorphic	=> true,	# to save the type of each element
-		:uniq					=> true		# to store only one instance of each element max
+		:polymorphic => true,  # to save the type of each element
+		:uniq        => true   # to store only one instance of each element max
 	
 end
 </code></pre>
@@ -128,7 +128,7 @@ end
 h3. Manipulating IDs for performance matters
 
 When manipulating @:has_list@ relations, you can use ID-methods instead of standard methods to improve performance.
-em. Of course, this only works with non-polymorphic relations.
+*%{color:red}Of course, this only works with non-polymorphic relations.%*
 
 <pre lang="ruby"><code>#File : app/models/users_group.rb
 
