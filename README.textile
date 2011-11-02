@@ -16,15 +16,15 @@ Update your bundle:
 
 h2. Basic Usage
 
-Use provided class methods in your ActiveRecord Models:
+h3. Simple arrays
 
-<pre lang="ruby"><code>#File : app/models/users_group.rb
+Define your array-like relation in your Model, like any other relation. Elements will be stored as String elements so usually you will use it to store String content, such as phone numbers:
 
-class UsersGroup < ActiveRecord::Base
+<pre lang="ruby"><code>#File : app/models/user.rb
 
-	has_list :users, :class_name => 'User'
+class User < ActiveRecord::Base
 
-	array_accessible :notes
+	array_accessible :phone_numbers
 
 end
 </code></pre>
@@ -35,67 +35,120 @@ Then access the lists like any other attribute:
 
 ...
 
-@users_group = UsersGroup.first
+@user = User.first
 
-@users_group.users = [User.find(2), User.find(25), User.find(5)]
-@users_group.users
+@user.phone_numbers = [
+	"+33 6 12 34 56 78",
+	"+33 1 98 76 54 32"
+]
+
+@user.phone_numbers
+# -> ["+33 6 12 34 56 78","+33 1 98 76 54 32"]
+
+...
+</code></pre>
+
+h3. Records lists
+
+This other method provides you with a mean to store a list of relations in one place. The class of your elements will be guessed from the attribute name, and elements will be stored with their ID.
+
+<pre lang="ruby"><code>#File : app/models/users_group.rb
+
+class UsersGroup < ActiveRecord::Base
+
+	has_list :users
+
+end
+</code></pre>
+
+Then access the lists like any other attribute:
+
+<pre lang="ruby"><code>#File : app/controllers/users_groups_controller.rb
+
+...
+
+@group = UsersGroup.first
+
+@group.users = [User.find(2), User.find(25), User.find(5)]
+@group.users
 # -> [#<User:0x... @id=2>, #<User:0x... @id=25>, #<User:0x... @id=5>]
-
-@users_group.notes = [12,14,12]
-@users_group.notes
-# -> [12,14,12]
 
 ...
 </code></pre>
 
 h2. Advanced Usage
 
-h3. Unicity of elements (group-like behaviour)
+h3. Customize the relation
 
-You can use options to force lists to contain unique elements:
+- @:class_name => 'Toto'@ allows you to force which class name to use (Toto, here)
+- @:uniq => true@ allows your list to act like a group with only one instance of each element
+- @:strict => true@ allows you to throw an error whenever a related record cannot be found anymore (cf. Non-existing instances)
+- @:polymorphic => true@ allows you to type the elements so that you can store different types of elements in the same list (cf. Polymorphic records list) 
 
-<pre lang="ruby"><code>#File : app/models/users_group.rb
+h3. Polymorphic records list
 
-class UsersGroup < ActiveRecord::Base
+By passing the option @:polyprophic => true@ to a relation, you can use your list as a way to store different types of elements. See the example bellow:
 
-	array_accessible :uniq_notes, :uniq => true
+<pre lang="ruby"><code>#File : app/models/boy.rb
 
+class Boy < ActiveRecord::Base
 end
 </code></pre>
 
-Then only one instance of each element is added to the list:
+<pre lang="ruby"><code>#File : app/models/girl.rb
 
-<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+class Girl < ActiveRecord::Base
+end
+</code></pre>
+
+<pre lang="ruby"><code>#File : app/models/group.rb
+
+class Group < ActiveRecord::Base
+	
+	has_list :members,
+		:polymorphic	=> true,	# to save the type of each element
+		:uniq					=> true		# to store only one instance of each element max
+	
+end
+</code></pre>
+
+<pre lang="ruby"><code>#File : app/controllers/groups_controller.rb
 
 ...
 
-@users_group = UsersGroup.first
+@group = Group.first
 
-@users_group.uniq_notes = [12,14,12]
-@users_group.uniq_notes
-# -> [12,14]
+@group.members = [Boy.find(2), Girl.find(25), Boy.find(5)]
+@group.members
+# -> [#<Boy:0x... @id=2>, #<Girl:0x... @id=25>, #<Boy:0x... @id=5>]
 
 ...
 </code></pre>
 
 h3. Manipulating IDs for performance matters
 
-When manipulating @:has_list@ relations, you can use ID-methods instead of standard methods to improve performance:
+When manipulating @:has_list@ relations, you can use ID-methods instead of standard methods to improve performance.
+em. Of course, this only works with non-polymorphic relations.
 
-<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+<pre lang="ruby"><code>#File : app/models/users_group.rb
+
+class UsersGroup < ActiveRecord::Base
+
+	has_list :users
+
+end
+</code></pre>
+
+<pre lang="ruby"><code>#File : app/controllers/users_groups_controller.rb
 
 ...
 
-@users_group = UsersGroup.first
+@group = UsersGroup.first
 
-@users_group.users = [User.find(2), User.find(25), User.find(5)]
-@users_group.users
-# -> [#<User:0x... @id=2>, #<User:0x... @id=25>, #<User:0x... @id=5>]
-
-@users_group.users_ids = [13,42]
-@users_group.users
+@group.users_ids = [13,42]
+@group.users
 # -> [#<User:0x... @id=13>, #<User:0x... @id=42>]
-@users_group.users_ids
+@group.users_ids
 # -> [13,42]
 
 ...
@@ -109,22 +162,23 @@ When IDs you provide don't exist in your Database, the default behaviour is to i
 
 class UsersGroup < ActiveRecord::Base
 
-	has_list :users, :class_name => 'User', :strict => true
+	has_list :users,
+		:strict => true
 
 end
 </code></pre>
 
 Thus whenever your DB object contains old IDs that have been removed or you try to add by hand an ID that doesn't exist, an error will be thrown:
 
-<pre lang="ruby"><code>#File : app/controllers/users_controller.rb
+<pre lang="ruby"><code>#File : app/controllers/users_groups_controller.rb
 
 ...
 
-@users_group = UsersGroup.first
+@group = UsersGroup.first
 
-@users_group.users = [User.find(2), User.find(3)]
+@group.users = [User.find(2), User.find(3)]
 User.find(3).destroy
-@users_group.users
+@group.users
 # -> throws "Unable to build list: RecordNotFound"
 
 ...
