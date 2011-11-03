@@ -75,7 +75,7 @@ module ArLists
 						else
 							class_name.constantize.find(r_code)
 						end
-					rescue RecordNotFound
+					rescue ActiveRecord::RecordNotFound
 						throw "Unable to build list: RecordNotFound" if strict
 						[]
 					end
