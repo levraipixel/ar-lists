@@ -16,7 +16,7 @@ module ArLists
 				strict = false || options[:strict]
 				is_typed = false || options[:polymorphic]
 
-				unless is_typed
+        unless is_typed
 					class_name = options[:class_name].blank? ? attr_name.to_s.singularize.classify : options[:class_name]
 					attr_accessible attr_name, "#{attr_name}_ids"
 					define_method "#{attr_name}_ids=" do |values|
@@ -29,6 +29,10 @@ module ArLists
 						val.blank? ? [] : val.split(',').map{|s| s.to_i}
 					end
 				end
+        define_method "#{attr_name}_count" do
+    			val = read_attribute attr_name
+					val.blank? ? 0 : val.split(',').count
+        end
 
 				define_method "#{attr_name}=" do |records|
 					val = records.map{|r|
