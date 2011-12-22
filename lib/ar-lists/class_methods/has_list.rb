@@ -58,12 +58,22 @@ module ArLists
 					}.flatten
 				end
 				if is_typed
-					scope "with_#{attr_name}_containing", lambda {|r|
-						where("(#{attr_name} = '#{r.class}:#{r.id}') OR (#{attr_name} LIKE '#{r.class}:#{r.id},%') OR (#{attr_name} LIKE '%,#{r.class}:#{r.id},%') OR (#{attr_name} LIKE '%,#{r.class}:#{r.id}')")
+					scope "with_#{attr_name}_containing", lambda {|record_or_records|
+						records = record_or_records.is_a?(Array) ? record_or_records : [record_or_records]
+						where(
+							records.map{|r|
+								"(#{attr_name} = '#{r.class}:#{r.id}') OR (#{attr_name} LIKE '#{r.class}:#{r.id},%') OR (#{attr_name} LIKE '%,#{r.class}:#{r.id},%') OR (#{attr_name} LIKE '%,#{r.class}:#{r.id}')"
+							}.join(" OR ")
+						)
 					}
 				else
-					scope "with_#{attr_name}_containing", lambda {|r|
-						where("(#{attr_name} = '#{r.id}') OR (#{attr_name} LIKE '#{r.id},%') OR (#{attr_name} LIKE '%,#{r.id},%') OR (#{attr_name} LIKE '%,#{r.id}')")
+					scope "with_#{attr_name}_containing", lambda {|record_or_records|
+						records = record_or_records.is_a?(Array) ? record_or_records : [record_or_records]
+						where(
+							records.map{|r|
+								"(#{attr_name} = '#{r.id}') OR (#{attr_name} LIKE '#{r.id},%') OR (#{attr_name} LIKE '%,#{r.id},%') OR (#{attr_name} LIKE '%,#{r.id}')"
+							}.join(" OR ")
+						)
 					}
 				end
 			end
